@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # Load MNIST dataset
 mnist = keras.datasets.mnist
@@ -28,8 +29,24 @@ loaded_model = keras.models.load_model("mnist_model.h5")
 # Make predictions
 predictions = loaded_model.predict(x_test)
 
+# Convert predicted probabilities to class labels
+predicted_labels = np.argmax(predictions, axis=1)
+
+# Compute MAE and MSE
+mae = mean_absolute_error(y_test, predicted_labels)
+mse = mean_squared_error(y_test, predicted_labels)
+
 # Select a random test image
 index = np.random.randint(0, len(x_test))
 plt.imshow(x_test[index], cmap='gray')
-plt.title(f"Predicted: {np.argmax(predictions[index])}, Actual: {y_test[index]}")
+plt.title(f"Predicted: {predicted_labels[index]}, Actual: {y_test[index]}")
 plt.show()
+
+# Write results to a text file
+with open("mnist_results.txt", "w") as file:
+    file.write(f"Predicted label for sample index {index}: {predicted_labels[index]}\n")
+    file.write(f"Actual label: {y_test[index]}\n")
+    file.write(f"Mean Absolute Error (MAE): {mae}\n")
+    file.write(f"Mean Squared Error (MSE): {mse}\n")
+
+print("Results saved to mnist_results.txt")
